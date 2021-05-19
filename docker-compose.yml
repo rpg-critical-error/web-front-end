@@ -1,0 +1,39 @@
+version: "3.5"
+
+services:
+    web:
+        container_name: critical_error_front_container
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        volumes:
+            - .:/src/app
+        networks:
+            - front-end-bridge
+        env_file: 
+            - ./front-end/.env
+        environment:
+            NODE_ENV: ${NODE_ENV}
+            PORT: 4200
+
+    nginx:
+        container_name: critical_error_front_nginx_container
+        restart: always
+        build: ./nginx/
+        volumes:
+            - /www/public
+        expose:
+            - "80"
+        depends_on:
+            - web
+        ports:
+            - 80:80
+        networks:
+            - front-end-bridge
+        links:
+            - web
+
+networks:
+    front-end-bridge:
+        name: front_end_bridge
+        driver: bridge
